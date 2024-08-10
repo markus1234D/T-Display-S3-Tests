@@ -32,7 +32,7 @@ void touchSetup(){
 	}
 
 	if (oTouch.setNotifyOnMovement()) {
-		oTouch.setMovementInterval(10);	//as example: limit to 10 per second (so 100 msec as interval)
+		oTouch.setMovementInterval(20);	//as example: limit to 10 per second (so 100 msec as interval)
 	} else {
 		//only available in 'fast'-mode
 		Serial.println("Set notify on movement failed");
@@ -74,27 +74,32 @@ void setup () {
 
 void loop () {
 	oTouch.control();
-	
+	int x = -1;
+	int y = -1;
 	if (oTouch.hadTouch()) {
-		int x = 0;
-		int y = 0;
 		oTouch.getLastTouchPosition(x, y);
-		
-		Serial.print("Click received at: (");
-		Serial.print(x);
-		Serial.print(",");
-		Serial.print(y);
-		Serial.println(")");
-
         bleMouse.click();
 	}
-	
-	if (oTouch.hadGesture()) {	//note that a gesture typically starts with a touch. Both will be provided here.
+	else if (oTouch.hadGesture()) {	//note that a gesture typically starts with a touch. Both will be provided here.
 		CST816Touch::gesture_t eGesture;
-		int x = 0;
-		int y = 0;
 		oTouch.getLastGesture(eGesture, x, y);
+		if (x > EXAMPLE_LCD_H_RES/2) {
+			Serial.print(CST816Touch::gestureIdToString(eGesture));
 
+		} else {
+			if(xPrev == -1 && yPrev == -1) {
+				Serial.println("First Touch");
+				xPrev = x;
+				yPrev = y;
+			}
+			xDistance = x - xPrev;
+			// Serial.println("X Distance: " + String(xDistance));
+			yDistance = y - yPrev;
+			// Serial.println("Y Distance: " + String(yDistance));
+			xPrev = x;
+			yPrev = y;
+			bleMouse.move(2*yDistance, 2*xDistance, 0);
+		}
 		// Serial.print("Gesture (");
 		// Serial.print(CST816Touch::gestureIdToString(eGesture));
 		// Serial.print(") received at: (");
@@ -105,22 +110,14 @@ void loop () {
 
         // Serial.println("X_prev: " + String(xPrev) + " Y_prev: " + String(yPrev));
 
-	    if(xPrev == -1 && yPrev == -1) {
-            Serial.println("First Touch");
-            xPrev = x;
-            yPrev = y;
-        }
-        xDistance = x - xPrev;
-        // Serial.println("X Distance: " + String(xDistance));
-        yDistance = y - yPrev;
-        // Serial.println("Y Distance: " + String(yDistance));
-        xPrev = x;
-        yPrev = y;
-        bleMouse.move(2*yDistance, 2*xDistance, 0);
+
     } 
     else {
+		if(xPrev != -1 && yPrev != -1) {
+			Serial.println("released at X: " + String(xPrev) + " Y: " + String(yPrev));
+		}
         xPrev = -1;
         yPrev = -1;
     }
-    delay(10);	
+    delay(20);	
 }
