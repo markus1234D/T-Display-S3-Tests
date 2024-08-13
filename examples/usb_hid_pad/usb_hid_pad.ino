@@ -9,11 +9,11 @@
 #include "TouchLib.h"
 
 
-#if ARDUINO_USB_MODE
-#warning This sketch should be used when USB is in OTG mode
-void setup() {}
-void loop() {}
-#else
+// #if ARDUINO_USB_MODE
+// #warning This sketch should be used when USB is in OTG mode
+// void setup() {}
+// void loop() {}
+// #else
 
 #include "Arduino.h"
 #include "OneButton.h"
@@ -73,6 +73,8 @@ lcd_cmd_t lcd_st7789v[] = {
 #endif
 OneButton left_button(PIN_BUTTON_1, true);
 OneButton right_button(PIN_BUTTON_2, true);
+
+
 void setup()
 {
     pinMode(PIN_POWER_ON, OUTPUT);
@@ -164,7 +166,7 @@ void loop()
     delay(5);
 }
 
-#endif
+// #endif
 
 
 
