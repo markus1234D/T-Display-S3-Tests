@@ -37,6 +37,14 @@ TouchDrvCSTXXX touch;
 int16_t x[5], y[5];
 
 
+enum Mode {
+    SCROLLJOYSTICK,
+    JOYSTICK_N_MOUSE,
+	LEN
+} ;
+enum Mode mode = JOYSTICK_N_MOUSE;
+
+
 // BLE Mouse Stuff
 #include <BleMouse.h>
 BleMouse bleMouse;
@@ -60,6 +68,17 @@ void scanDevices(void)
     if (nDevices == 0) {
         Serial.println("No I2C devices found");
     }
+}
+
+void nextMode() {
+	mode = (Mode) ((mode + 1) % LEN);
+	Serial.println("Mode: " + String((Mode) mode));
+	// if (mode == MOUSE_JOYSTICKMOUSE){
+	// 	analogWrite(PIN_LCD_BL, 50);
+	// }
+	// else {
+	// 	analogWrite(PIN_LCD_BL, 0);
+	// }
 }
 
 void setup()
@@ -115,6 +134,7 @@ void setup()
     // Depending on the touch panel, not all touch panels have touch buttons.
     touch.setHomeButtonCallback([](void *user_data) {
         Serial.println("Home key pressed!");
+        nextMode();
     }, NULL);
 
 
@@ -137,33 +157,74 @@ int xDistance = 0;
 int yDistance = 0;
 int xPrev = 0;
 int yPrev = 0;
+bool screenTouched = false;
+int joystickCenterX = -1;
+int joystickCenterY = -1;
 
+
+
+
+void joystick_n_mouse(uint8_t touched, int x, int y){
+    if (touched) {
+        if(!screenTouched) {
+            Serial.println("First Touch");
+            screenTouched = true;
+            xPrev = joystickCenterX = x;
+            yPrev = joystickCenterY = y;
+
+        }
+        if(joystickCenterY > EXAMPLE_LCD_H_RES/2) {
+            //upper half
+            xDistance = x - xPrev;
+            if(xDistance != 0) {
+                // Serial.println("X Distance: " + String(xDistance));
+                // Serial.println("X: " + String(x) + " Y: " + String(y));
+                // Serial.println("X_prev: " + String(xPrev) + " Y_prev: " + String(yPrev));
+            }
+            yDistance = y - yPrev;
+            if(yDistance != 0) {
+                // Serial.println("Y Distance: " + String(yDistance));
+                // Serial.println("X: " + String(x) + " Y: " + String(y));
+                // Serial.println("X_prev: " + String(xPrev) + " Y_prev: " + String(yPrev));
+            }
+            xPrev = x;
+            yPrev = y;
+            bleMouse.move(-xDistance, -yDistance, 0);
+        }
+        else{
+            // Lower half
+            // (joystick)
+            xDistance = x - joystickCenterX;
+            yDistance = y - joystickCenterY;
+            if(xDistance != 0 || yDistance != 0) {
+                bleMouse.move((int)-xDistance/2, (int)-yDistance/2, 0);
+            }
+        }
+    } 
+    else {
+        //not touched
+        xPrev = -1;
+        yPrev = -1;
+        if(screenTouched) {
+            Serial.println("released at X: " + String(xPrev) + " Y: " + String(yPrev));
+            screenTouched = false;
+            joystickCenterX = joystickCenterY = -1;
+        }
+
+    }
+}
+void scrollJoystick(uint8_t touched, int x, int y){
+
+}
 void loop()
 {
     uint8_t touched = touch.getPoint(x, y, touch.getSupportTouchPoint());
-    if (touched) {
-        // Serial.println("Touched: " + String(touched));
-        Serial.println("X_prev: " + String(xPrev) + " Y_prev: " + String(yPrev));
-        Serial.println("X: " + String(x[0]) + " Y: " + String(y[0]));
-        if(xPrev == -1 && yPrev == -1 ) {
-            Serial.println("First Touch");
-            xPrev = (int)x[0];
-            yPrev = (int)y[0];
-        }
-        xDistance = (int)x[0] - (int)xPrev;
-        Serial.println("X Distance: " + String(xDistance));
-        yDistance = y[0] - yPrev;
-        Serial.println("Y Distance: " + String(yDistance));
-        xPrev = x[0];
-        yPrev = y[0];
-        bleMouse.move(-2*xDistance, -2*yDistance, 0);
-    } 
-    else {
-        xPrev = -1;
-        yPrev = -1;
+    if(mode == JOYSTICK_N_MOUSE){
+        joystick_n_mouse(touched, x[0], y[0]);
     }
+    else if(mode == SCROLLJOYSTICK){
+        scrollJoystick(touched, x[0], y[0]);
+    }
+
     delay(100);
 }
-
-
-
