@@ -161,9 +161,6 @@ bool screenTouched = false;
 int joystickCenterX = -1;
 int joystickCenterY = -1;
 
-
-
-
 void joystick_n_mouse(uint8_t touched, int x, int y){
     if (touched) {
         if(!screenTouched) {
@@ -171,7 +168,6 @@ void joystick_n_mouse(uint8_t touched, int x, int y){
             screenTouched = true;
             xPrev = joystickCenterX = x;
             yPrev = joystickCenterY = y;
-
         }
         if(joystickCenterY > EXAMPLE_LCD_H_RES/2) {
             //upper half
@@ -210,11 +206,30 @@ void joystick_n_mouse(uint8_t touched, int x, int y){
             screenTouched = false;
             joystickCenterX = joystickCenterY = -1;
         }
-
     }
 }
 void scrollJoystick(uint8_t touched, int x, int y){
-
+    if (touched) {
+        if(!screenTouched) {
+            Serial.println("First Touch");
+            screenTouched = true;
+            joystickCenterX = x;
+            joystickCenterY = y;
+        }
+            xDistance = x - joystickCenterX;
+            yDistance = y - joystickCenterY;
+            if(xDistance != 0 || yDistance != 0) {
+                bleMouse.move(0, 0, (int)-xDistance/2, (int)-yDistance/2);
+            }
+    } 
+    else {
+        //not touched
+        if(screenTouched) {
+            Serial.println("released at X: " + String(xPrev) + " Y: " + String(yPrev));
+            screenTouched = false;
+            joystickCenterX = joystickCenterY = -1;
+        }
+    }
 }
 void loop()
 {
