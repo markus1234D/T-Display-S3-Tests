@@ -137,7 +137,8 @@ void setup()
         nextMode();
     }, NULL);
 
-
+    touch.enableAutoSleep();
+    
     // Unable to obtain coordinates after turning on sleep
     // CST816T sleep current = 1.1 uA
     // CST226SE sleep current = 60 uA
@@ -225,7 +226,7 @@ void scrollJoystick(uint8_t touched, int x, int y){
     else {
         //not touched
         if(screenTouched) {
-            Serial.println("released at X: " + String(xPrev) + " Y: " + String(yPrev));
+            Serial.println("released at X: " + String(x) + " Y: " + String(y));
             screenTouched = false;
             joystickCenterX = joystickCenterY = -1;
         }
