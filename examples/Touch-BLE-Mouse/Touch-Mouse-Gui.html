@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Touchpad GUI</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+    }
+    
+    #screenContainer {
+    display: flex;
+    flex-direction: column; /* Ändert die Ausrichtung auf vertikal */
+    width: 25%;
+    height: 70vh; /* Passt die Höhe des Containers an die volle Bildschirmhöhe an */
+    margin-top: 20px;
+    border: 2px solid #333;
+}
+
+.screen-section {
+    border: 1px solid #888;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    margin: 5px;
+    padding: 20px;
+}
+    
+    label {
+        margin-right: 10px;
+    }
+    
+    select {
+        margin-bottom: 20px;
+    }
+    </style>
+</head>
+
+<body>
+    <h1>Touchpad GUI</h1>
+
+    <div>
+        <label for="layoutSelect">Wähle Bildschirmaufteilung:</label>
+        <select id="layoutSelect">
+            <option value="1">1 Bereich</option>
+            <option value="2">2 Bereiche</option>
+            <option value="3">3 Bereiche</option>
+        </select>
+    </div>
+
+    <div id="screenContainer">
+        <!-- Dynamisch erzeugte Bereiche werden hier eingefügt -->
+    </div>
+
+    <script>
+        document.getElementById('layoutSelect').addEventListener('change', function() {
+            const screenContainer = document.getElementById('screenContainer');
+            screenContainer.innerHTML = '';  // Bildschirm leeren
+        
+            const layoutValue = parseInt(this.value);
+        
+            for (let i = 0; i < layoutValue; i++) {
+                // Erstellt einen neuen Bereich
+                const section = document.createElement('div');
+                section.className = 'screen-section';
+        
+                // Auswahl für Funktion (Mouse oder Joystick-Mouse)
+                const functionSelect = document.createElement('select');
+                const optionMouse = document.createElement('option');
+                optionMouse.value = 'mouse';
+                optionMouse.textContent = 'Mouse';
+                const optionJoystickMouse = document.createElement('option');
+                optionJoystickMouse.value = 'joystick-mouse';
+                optionJoystickMouse.textContent = 'Joystick-Mouse';
+                const optionScrollJoystick = document.createElement('option');
+                optionScrollJoystick.value = 'scroll-joystick';
+                optionScrollJoystick.textContent = 'Scroll-Joystick';
+                const optionClicker = document.createElement('option');
+                optionClicker.value = 'clicker';
+                optionClicker.textContent = 'Clicker';
+        
+                functionSelect.appendChild(optionMouse);
+                functionSelect.appendChild(optionJoystickMouse);
+                functionSelect.appendChild(optionScrollJoystick);
+                functionSelect.appendChild(optionClicker);
+        
+                section.appendChild(functionSelect);
+                // Fügt den Bereich in den Container ein
+                screenContainer.appendChild(section);
+            }
+        });
+    </script>
+</body>
+
+
+</html>

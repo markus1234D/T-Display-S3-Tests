@@ -1,11 +1,12 @@
 #include "Display.h"
 
-Display display(true);
+Display display(false);
 
 void setup(){
-    display.println("hallo");
+    display.begin();
 }
 
 void loop(){
-
+    display.loop();
+    delay(50);
 }
