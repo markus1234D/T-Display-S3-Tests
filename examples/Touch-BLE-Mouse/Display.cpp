@@ -165,6 +165,19 @@ void Display::appendFunction(enum ScreenPos pos){
 
 }
 
+void Display::setFunctionArray(fp func1, fp func2, fp func3){
+  this->funcArray[0] = func1;
+  this->funcArray[1] = func2;
+  this->funcArray[2] = func3;
+}
+
+
+void Display::print(String str){
+  if(debug){
+    Serial.print(str);
+  }
+}
+
 void Display::begin(){
 
     bleMouse.begin();
@@ -174,33 +187,6 @@ void Display::begin(){
     // this->funcArray[1] = &Display::handleScrollJoystick;
 }
 
-void Display::handleMouseJoystick(){
-  if(data[DataIdx::TOUCHED][pasteIdx] == 1){
-    if (data[DataIdx::TOUCHED][(pasteIdx-1)%42] == 0) {
-      // first touch
-      joystickCenterX = data[DataIdx::X_idx][pasteIdx];
-      joystickCenterY = data[DataIdx::Y_idx][pasteIdx];
-    }
-    else
-    {
-      xDistance = data[DataIdx::X_idx][pasteIdx] - joystickCenterX;
-      yDistance = data[DataIdx::Y_idx][pasteIdx] - joystickCenterY;
-      println("X Distance: " + String(xDistance) + " Y Distance: " + String(yDistance));
-      bleMouse.move((int)xDistance/2, (int)yDistance/2, 0);
-    }
-  }
-  else
-  {
-    joystickCenterX = -1;
-    joystickCenterY = -1;
-  }
-
-}
-void Display::print(String str){
-  if(debug){
-    Serial.print(str);
-  }
-}
 void Display::loop(){
   data[DataIdx::MILLIS][pasteIdx] = 0;
   data[DataIdx::TOUCHED][pasteIdx] = 0;
@@ -223,7 +209,7 @@ void Display::loop(){
   }
   println(String(pasteIdx) + " ; MILLIS: " + String(data[DataIdx::MILLIS][pasteIdx]) + " ; TOUCHED: " + String(data[DataIdx::TOUCHED][pasteIdx]) + " ; X_idx: " + String(data[DataIdx::X_idx][pasteIdx]) + " ; Y_idx: " + String(data[DataIdx::Y_idx][pasteIdx]) + " ; SCROLL_UP: " + String(data[DataIdx::SCROLL_UP][pasteIdx]) + " ; SCROLL_DOWN: " + String(data[DataIdx::SCROLL_DOWN][pasteIdx]) + " ; HOME_BUTTON: " + String(data[DataIdx::HOME_BUTTON][pasteIdx]) + " ; ");
     int16_t min_x, max_x, min_y, max_y;
-    switch (sizeof(funcArray)/sizeof(fp))
+    switch (this->bereiche)
     {
     case 0:
       break;
@@ -266,4 +252,88 @@ void Display::loop(){
       break;
   }
   pasteIdx = (pasteIdx + 1) % 42;
+}
+
+void Display::handleMouse(void){
+  if(data[DataIdx::TOUCHED][pasteIdx] == 1){
+    if (data[DataIdx::TOUCHED][(pasteIdx-1)%42] == 0) {
+      // first touch
+      bleMouse.press();
+    }
+    else
+    {
+      bleMouse.move((int)data[DataIdx::X_idx][pasteIdx], (int)data[DataIdx::Y_idx][pasteIdx], 0);
+    }
+  }
+  else
+  {
+    bleMouse.release();
+  }
+}
+
+void Display::handleMouseJoystick(){
+  if(data[DataIdx::TOUCHED][pasteIdx] == 1){
+    if (data[DataIdx::TOUCHED][(pasteIdx-1)%42] == 0) {
+      // first touch
+      joystickCenterX = data[DataIdx::X_idx][pasteIdx];
+      joystickCenterY = data[DataIdx::Y_idx][pasteIdx];
+    }
+    else
+    {
+      xDistance = data[DataIdx::X_idx][pasteIdx] - joystickCenterX;
+      yDistance = data[DataIdx::Y_idx][pasteIdx] - joystickCenterY;
+      println("X Distance: " + String(xDistance) + " Y Distance: " + String(yDistance));
+      bleMouse.move((int)xDistance/2, (int)yDistance/2, 0);
+    }
+  }
+  else
+  {
+    joystickCenterX = -1;
+    joystickCenterY = -1;
+  }
+
+}
+
+void Display::handleScrollJoystick(){
+  if(data[DataIdx::TOUCHED][pasteIdx] == 1){
+    if (data[DataIdx::TOUCHED][(pasteIdx-1)%42] == 0) {
+      // first touch
+      joystickCenterX = data[DataIdx::X_idx][pasteIdx];
+      joystickCenterY = data[DataIdx::Y_idx][pasteIdx];
+    }
+    else
+    {
+      xDistance = data[DataIdx::X_idx][pasteIdx] - joystickCenterX;
+      yDistance = data[DataIdx::Y_idx][pasteIdx] - joystickCenterY;
+      println("X Distance: " + String(xDistance) + " Y Distance: " + String(yDistance));
+      if(yDistance > 0){
+        bleMouse.move(0, 0, 1);
+      }
+      else if(yDistance < 0){
+        bleMouse.move(0, 0, -1);
+      }
+    }
+  }
+  else
+  {
+    joystickCenterX = -1;
+    joystickCenterY = -1;
+  }
+}
+
+void Display::handleClicker(){
+  if(data[DataIdx::TOUCHED][pasteIdx] == 1){
+    if (data[DataIdx::TOUCHED][(pasteIdx-1)%42] == 0) {
+      // first touch
+      bleMouse.press();
+    }
+    else
+    {
+      bleMouse.release();
+    }
+  }
+  else
+  {
+    bleMouse.release();
+  }
 }

@@ -4,43 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Touchpad GUI</title>
-    <link rel="stylesheet" href="styles.css">
-
     <style>
         body {
-        font-family: Arial, sans-serif;
-        text-align: center;
-    }
-    
-    #screenContainer {
-    display: flex;
-    flex-direction: column; /* Ändert die Ausrichtung auf vertikal */
-    width: 25%;
-    height: 70vh; /* Passt die Höhe des Containers an die volle Bildschirmhöhe an */
-    margin-top: 20px;
-    border: 2px solid #333;
-}
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
 
-.screen-section {
-    border: 1px solid #888;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex: 1;
-    margin: 5px;
-    padding: 20px;
-}
-    
-    label {
-        margin-right: 10px;
-    }
-    
-    select {
-        margin-bottom: 20px;
-    }
+        #screenContainer {
+            display: flex;
+            flex-direction: column; /* Ändert die Ausrichtung auf vertikal */
+            width: 25%;
+            height: 70vh;
+            margin-top: 20px;
+            border: 2px solid #333;
+        }
+
+        .screen-section {
+            border: 1px solid #888;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+            margin: 5px;
+            padding: 20px;
+        }
+
+        label {
+            margin-right: 10px;
+        }
+
+        select {
+            margin-bottom: 20px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+
+        #output {
+            margin-top: 20px;
+            font-weight: bold;
+        }
     </style>
 </head>
-
 <body>
     <h1>Touchpad GUI</h1>
 
@@ -57,45 +66,75 @@
         <!-- Dynamisch erzeugte Bereiche werden hier eingefügt -->
     </div>
 
+    <button id="submitBtn">Auswahl anzeigen</button>
+
+    <div id="output"></div>
+
     <script>
         document.getElementById('layoutSelect').addEventListener('change', function() {
             const screenContainer = document.getElementById('screenContainer');
             screenContainer.innerHTML = '';  // Bildschirm leeren
-        
+
             const layoutValue = parseInt(this.value);
-        
+
             for (let i = 0; i < layoutValue; i++) {
                 // Erstellt einen neuen Bereich
                 const section = document.createElement('div');
                 section.className = 'screen-section';
-        
-                // Auswahl für Funktion (Mouse oder Joystick-Mouse)
+
+                // Auswahl für Funktion
                 const functionSelect = document.createElement('select');
-                const optionMouse = document.createElement('option');
-                optionMouse.value = 'mouse';
-                optionMouse.textContent = 'Mouse';
-                const optionJoystickMouse = document.createElement('option');
-                optionJoystickMouse.value = 'joystick-mouse';
-                optionJoystickMouse.textContent = 'Joystick-Mouse';
-                const optionScrollJoystick = document.createElement('option');
-                optionScrollJoystick.value = 'scroll-joystick';
-                optionScrollJoystick.textContent = 'Scroll-Joystick';
-                const optionClicker = document.createElement('option');
-                optionClicker.value = 'clicker';
-                optionClicker.textContent = 'Clicker';
-        
-                functionSelect.appendChild(optionMouse);
-                functionSelect.appendChild(optionJoystickMouse);
-                functionSelect.appendChild(optionScrollJoystick);
-                functionSelect.appendChild(optionClicker);
-        
+                const options = ['Mouse', 'Joystick-Mouse', 'Scroll-Joystick', 'Clicker'];
+                
+                options.forEach(optionText => {
+                    const option = document.createElement('option');
+                    option.value = optionText.toLowerCase().replace(' ', '-');
+                    option.textContent = optionText;
+                    functionSelect.appendChild(option);
+                });
+
                 section.appendChild(functionSelect);
+
                 // Fügt den Bereich in den Container ein
                 screenContainer.appendChild(section);
             }
         });
+        function functionName2Idx(name) {
+            switch(name) {
+                case "mouse":
+                    return 0;
+                case "joystick-mouse":
+                    return 1;
+                case "scroll-joystick":
+                    return 2;
+                case "clicker":
+                    return 3;
+                default:
+                    return -1;
+            }
+        }
+        document.getElementById('submitBtn').addEventListener('click', function() {
+            const sections = document.querySelectorAll('.screen-section select');
+            // let output = `{"len" : "${sections.length}",\n`;
+            let output = "/functions?";
+
+            sections.forEach((select, index) => {
+                const idx = functionName2Idx(select.value);
+                output += `Bereich${index}=${idx}&`;
+            });
+            output = output.slice(0, -1); 
+            // output += "}";
+            console.log(output);
+
+            document.getElementById('output').textContent = output;
+            fetch_command(output);
+        });
+
+        function fetch_command(command) {
+            console.log("fetch_command: " + command);
+            fetch(command)
+        }
+
     </script>
 </body>
-
-
 </html>

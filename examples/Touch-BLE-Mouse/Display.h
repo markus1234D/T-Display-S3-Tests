@@ -73,8 +73,13 @@ public:
     void handleMouseJoystick();
     void handleClicker();
 
+
     typedef void (Display::*fp)(void);
-    fp funcArray[1];
+
+    fp funcArray[3];
+    int bereiche = 1;
+
+    void setFunctionArray(fp first, fp second = NULL, fp third = NULL);
 };
 
 
