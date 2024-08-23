@@ -258,11 +258,10 @@ void Display::handleMouse(void){
   if(data[DataIdx::TOUCHED][pasteIdx] == 1){
     if (data[DataIdx::TOUCHED][(pasteIdx-1)%42] == 0) {
       // first touch
-      bleMouse.press();
     }
     else
     {
-      bleMouse.move((int)data[DataIdx::X_idx][pasteIdx], (int)data[DataIdx::Y_idx][pasteIdx], 0);
+      bleMouse.move((int)data[DataIdx::X_idx][pasteIdx]-(int)data[DataIdx::X_idx][(pasteIdx-1)%42], (int)data[DataIdx::Y_idx][pasteIdx]-(int)data[DataIdx::Y_idx][(pasteIdx-1)%42], 0);
     }
   }
   else
@@ -324,16 +323,27 @@ void Display::handleScrollJoystick(){
 void Display::handleClicker(){
   if(data[DataIdx::TOUCHED][pasteIdx] == 1){
     if (data[DataIdx::TOUCHED][(pasteIdx-1)%42] == 0) {
-      // first touch
-      bleMouse.press();
+      println("First Touch");
+      if (data[DataIdx::X_idx][pasteIdx] > EXAMPLE_LCD_V_RES / 2) {
+        bleMouse.press(MOUSE_RIGHT);
+      } else {
+        bleMouse.press(MOUSE_LEFT);
+      }      
     }
     else
     {
-      bleMouse.release();
+      //move
     }
   }
   else
   {
-    bleMouse.release();
+    print("release ");
+    if (data[DataIdx::X_idx][(pasteIdx-1)%42] > EXAMPLE_LCD_V_RES / 2) {
+      bleMouse.release(MOUSE_RIGHT);
+      println("Right");
+    } else {
+      bleMouse.release(MOUSE_LEFT);
+      println("Left");
+    }
   }
 }

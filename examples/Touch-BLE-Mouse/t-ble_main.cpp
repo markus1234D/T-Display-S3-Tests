@@ -102,7 +102,7 @@ void handleRoot() {
 
                 // Auswahl für Funktion
                 const functionSelect = document.createElement('select');
-                const options = ['Mouse', 'Joystick-Mouse', 'Scroll-Joystick', 'Clicker'];
+                const options = ['Mouse', 'Scroll-Joystick', 'Joystick-Mouse', 'Clicker'];
                 
                 options.forEach(optionText => {
                     const option = document.createElement('option');
@@ -211,28 +211,28 @@ void setup(){
                 int funcIdx = arg.toInt();
                 Serial.print("Function index: ");
                 Serial.println(funcIdx);
-                switch (funcIdx)
-                {
-                case Display::Mode::MOUSE:
-                    Serial.println("Mode: MOUSE");
-                    display.funcArray[i] = &Display::handleMouse;
-                    break;
-                case Display::Mode::SCROLLJOYSTICK:
-                    Serial.println("Mode: SCROLLJOYSTICK");
-                    display.funcArray[i] = &Display::handleScrollJoystick;
-                    break;
-                case Display::Mode::MOUSEJOYSTICK:
-                    Serial.println("Mode: MOUSEJOYSTICK");
-                    display.funcArray[i] = &Display::handleMouseJoystick;
-                    break;
-                case Display::Mode::CLICKER:
-                    Serial.println("Mode: CLICKER");
-                    display.funcArray[i] = &Display::handleClicker;
-                    break;
-                default:
-                    display.funcArray[i] = NULL;
-                    break;
-                }
+                // switch (funcIdx)
+                // {
+                // case Display::Mode::MOUSE:
+                //     Serial.println("Mode: MOUSE");
+                //     display.funcArray[i] = &Display::handleMouse;
+                //     break;
+                // case Display::Mode::SCROLLJOYSTICK:
+                //     Serial.println("Mode: SCROLLJOYSTICK");
+                //     display.funcArray[i] = &Display::handleScrollJoystick;
+                //     break;
+                // case Display::Mode::MOUSEJOYSTICK:
+                //     Serial.println("Mode: MOUSEJOYSTICK");
+                //     display.funcArray[i] = &Display::handleMouseJoystick;
+                //     break;
+                // case Display::Mode::CLICKER:
+                //     Serial.println("Mode: CLICKER");
+                //     display.funcArray[i] = &Display::handleClicker;
+                //     break;
+                // default:
+                //     display.funcArray[i] = NULL;
+                //     break;
+                // }
             }
         }
     });
