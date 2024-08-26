@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zeichenfeld mit Reset</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        #canvas {
+            border: 2px solid black;
+            cursor: crosshair;
+            image-rendering: pixelated; /* Pixelige Darstellung */
+        }
+        #controls {
+            margin-top: 20px;
+        }
+        #coordinates {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Zeichnen mit der Maus</h1>
+    <canvas id="canvas" width="170" height="320"></canvas>
+    <div id="coordinates">X: 0, Y: 0</div>
+    <div id="controls">
+        <button id="resetButton">Zurücksetzen</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const coordinatesDiv = document.getElementById('coordinates');
+        const resetButton = document.getElementById('resetButton');
+
+        var ws = new WebSocket("ws://192.168.100.137/");
+        ws.onopen = function() {
+            console.log("Hello, Server");
+        };
+        ws.onmessage = function (evt) {
+            console.log("msg");
+            if (evt.data == "clear") {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        };
+        ws.onclose = function() {
+            console.log("Connection is closed...");
+        };
+
+        let drawing = false;
+
+        // Linienbreite für größere "Pixel"
+        ctx.lineWidth = 5;  // Erhöht die Linienstärke
+        ctx.linecolor = "red"; // Linienfarbe
+        // Maus-Position verfolgen und anzeigen
+        canvas.addEventListener('mousemove', (e) => {
+            if (!drawing) {
+                return;
+            }
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            coordinatesDiv.textContent = `X: ${Math.round(x)}, Y: ${Math.round(y)}`;
+            console.log("/coord?X=" + Math.round(x) + "&Y=" + Math.round(y));
+            fetch("/coord?X=" + Math.round(x) + "&Y=" + Math.round(y));
+            if (drawing) {
+                ctx.lineTo(x, y);
+                ctx.stroke();
+            }
+        });
+
+        // Zeichnen beginnen
+        canvas.addEventListener('mousedown', (e) => {
+            drawing = true;
+            ctx.beginPath();
+            const rect = canvas.getBoundingClientRect();
+            const pointX = e.clientX - rect.left;
+            const pointY = e.clientY - rect.top;
+            ctx.moveTo(pointY, pointX);
+            console.log("/coord?X=" + Math.round(pointX) + "&Y=" + Math.round(pointY));
+            
+            fetch("/coord?X=" + pointX + "&Y=" + pointY);
+        });
+
+        // Zeichnen beenden
+        canvas.addEventListener('mouseup', () => {
+            drawing = false;
+        });
+
+        // Zeichnung zurücksetzen
+        resetButton.addEventListener('click', () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            coordinatesDiv.textContent = `X: 0, Y: 0`;
+            ws.("/clear");
+        });
+    </script>
+</body>
+</html>

@@ -44,6 +44,24 @@ void Display::calculate_min_max_coord(ScreenPos sp, int16_t *min_x, int16_t *max
     *min_y = EXAMPLE_LCD_H_RES / 2;
     *max_y = EXAMPLE_LCD_H_RES;
     break;
+  case ScreenPos::FIRST_THIRD:
+    *min_x = 0;
+    *max_x = EXAMPLE_LCD_V_RES;
+    *min_y = 0;
+    *max_y = EXAMPLE_LCD_H_RES / 3;
+    break;
+  case ScreenPos::SECOND_THIRD:
+    *min_x = 0;
+    *max_x = EXAMPLE_LCD_V_RES;
+    *min_y = EXAMPLE_LCD_H_RES / 3;
+    *max_y = 2 * EXAMPLE_LCD_H_RES / 3;
+    break;
+  case ScreenPos::THIRD_THIRD:
+    *min_x = 0;
+    *max_x = EXAMPLE_LCD_V_RES;
+    *min_y = 2 * EXAMPLE_LCD_H_RES / 3;
+    *max_y = EXAMPLE_LCD_H_RES;
+    break;
   
   default:
     println("Invalid ScreenPos");
@@ -203,51 +221,51 @@ void Display::loop(){
 
       // println(String(touched) + " points detected");
       // println("x: " + String(this->data[DataIdx::X_idx][this->pasteIdx]) + " y: " + String(this->data[DataIdx::Y_idx][this->pasteIdx]));
-        if(data[DataIdx::TOUCHED][(pasteIdx-1)%42] == 0){ 
-          Serial.println("First Touch");
-        }
+        // if(data[DataIdx::TOUCHED][(pasteIdx-1)%42] == 0){ 
+        //   Serial.println("First Touch");
+        // }
   }
   println(String(pasteIdx) + " ; MILLIS: " + String(data[DataIdx::MILLIS][pasteIdx]) + " ; TOUCHED: " + String(data[DataIdx::TOUCHED][pasteIdx]) + " ; X_idx: " + String(data[DataIdx::X_idx][pasteIdx]) + " ; Y_idx: " + String(data[DataIdx::Y_idx][pasteIdx]) + " ; SCROLL_UP: " + String(data[DataIdx::SCROLL_UP][pasteIdx]) + " ; SCROLL_DOWN: " + String(data[DataIdx::SCROLL_DOWN][pasteIdx]) + " ; HOME_BUTTON: " + String(data[DataIdx::HOME_BUTTON][pasteIdx]) + " ; ");
-    int16_t min_x, max_x, min_y, max_y;
-    switch (this->bereiche)
-    {
-    case 0:
-      break;
-    case 1:
-      calculate_min_max_coord(FULLSCREEN, &min_x, &max_x, &min_y, &max_y);
-      if(this->data[DataIdx::X_idx][this->pasteIdx] > min_x && this->data[DataIdx::X_idx][this->pasteIdx] < max_x &&
-        this->data[DataIdx::Y_idx][this->pasteIdx] > min_y && this->data[DataIdx::Y_idx][this->pasteIdx] < max_y){
-          (this->*funcArray[0])();
-      }
-      break;
-    case 2:
-      calculate_min_max_coord(FIRST_HALF, &min_x, &max_x, &min_y, &max_y);
-      if(this->data[DataIdx::X_idx][this->pasteIdx] > min_x && this->data[DataIdx::X_idx][this->pasteIdx] < max_x &&
-        this->data[DataIdx::Y_idx][this->pasteIdx] > min_y && this->data[DataIdx::Y_idx][this->pasteIdx] < max_y){
-          (this->*funcArray[0])();
-      }
-      calculate_min_max_coord(SECOND_HALF, &min_x, &max_x, &min_y, &max_y);
-      if(this->data[DataIdx::X_idx][this->pasteIdx] > min_x && this->data[DataIdx::X_idx][this->pasteIdx] < max_x &&
-        this->data[DataIdx::Y_idx][this->pasteIdx] > min_y && this->data[DataIdx::Y_idx][this->pasteIdx] < max_y){
-          (this->*funcArray[1])();
-      }
-      break;
-    case 3:
-      calculate_min_max_coord(FIRST_THIRD, &min_x, &max_x, &min_y, &max_y);
-      if(this->data[DataIdx::X_idx][this->pasteIdx] > min_x && this->data[DataIdx::X_idx][this->pasteIdx] < max_x &&
-        this->data[DataIdx::Y_idx][this->pasteIdx] > min_y && this->data[DataIdx::Y_idx][this->pasteIdx] < max_y){
-          (this->*funcArray[0])();
-      }
-      calculate_min_max_coord(SECOND_THIRD, &min_x, &max_x, &min_y, &max_y);
-      if(this->data[DataIdx::X_idx][this->pasteIdx] > min_x && this->data[DataIdx::X_idx][this->pasteIdx] < max_x &&
-        this->data[DataIdx::Y_idx][this->pasteIdx] > min_y && this->data[DataIdx::Y_idx][this->pasteIdx] < max_y){
-          (this->*funcArray[1])();
-      }
-      calculate_min_max_coord(THIRD_THIRD, &min_x, &max_x, &min_y, &max_y);
-      if(this->data[DataIdx::X_idx][this->pasteIdx] > min_x && this->data[DataIdx::X_idx][this->pasteIdx] < max_x &&
-        this->data[DataIdx::Y_idx][this->pasteIdx] > min_y && this->data[DataIdx::Y_idx][this->pasteIdx] < max_y){
-          (this->*funcArray[2])();
-      }
+  int16_t min_x, max_x, min_y, max_y;
+  switch (this->bereiche)
+  {
+  case 0:
+    break;
+  case 1:
+    calculate_min_max_coord(FULLSCREEN, &min_x, &max_x, &min_y, &max_y);
+    if(this->data[DataIdx::X_idx][this->pasteIdx] > min_x && this->data[DataIdx::X_idx][this->pasteIdx] < max_x &&
+      this->data[DataIdx::Y_idx][this->pasteIdx] > min_y && this->data[DataIdx::Y_idx][this->pasteIdx] < max_y){
+        (this->*funcArray[0])();
+    }
+    break;
+  case 2:
+    calculate_min_max_coord(FIRST_HALF, &min_x, &max_x, &min_y, &max_y);
+    if(this->data[DataIdx::X_idx][this->pasteIdx] > min_x && this->data[DataIdx::X_idx][this->pasteIdx] < max_x &&
+      this->data[DataIdx::Y_idx][this->pasteIdx] > min_y && this->data[DataIdx::Y_idx][this->pasteIdx] < max_y){
+        (this->*funcArray[0])();
+    }
+    calculate_min_max_coord(SECOND_HALF, &min_x, &max_x, &min_y, &max_y);
+    if(this->data[DataIdx::X_idx][this->pasteIdx] > min_x && this->data[DataIdx::X_idx][this->pasteIdx] < max_x &&
+      this->data[DataIdx::Y_idx][this->pasteIdx] > min_y && this->data[DataIdx::Y_idx][this->pasteIdx] < max_y){
+        (this->*funcArray[1])();
+    }
+    break;
+  case 3:
+    calculate_min_max_coord(FIRST_THIRD, &min_x, &max_x, &min_y, &max_y);
+    if(this->data[DataIdx::X_idx][this->pasteIdx] > min_x && this->data[DataIdx::X_idx][this->pasteIdx] < max_x &&
+      this->data[DataIdx::Y_idx][this->pasteIdx] > min_y && this->data[DataIdx::Y_idx][this->pasteIdx] < max_y){
+        (this->*funcArray[0])();
+    }
+    calculate_min_max_coord(SECOND_THIRD, &min_x, &max_x, &min_y, &max_y);
+    if(this->data[DataIdx::X_idx][this->pasteIdx] > min_x && this->data[DataIdx::X_idx][this->pasteIdx] < max_x &&
+      this->data[DataIdx::Y_idx][this->pasteIdx] > min_y && this->data[DataIdx::Y_idx][this->pasteIdx] < max_y){
+        (this->*funcArray[1])();
+    }
+    calculate_min_max_coord(THIRD_THIRD, &min_x, &max_x, &min_y, &max_y);
+    if(this->data[DataIdx::X_idx][this->pasteIdx] > min_x && this->data[DataIdx::X_idx][this->pasteIdx] < max_x &&
+      this->data[DataIdx::Y_idx][this->pasteIdx] > min_y && this->data[DataIdx::Y_idx][this->pasteIdx] < max_y){
+        (this->*funcArray[2])();
+    }
     default:
       break;
   }
@@ -325,9 +343,9 @@ void Display::handleClicker(){
     if (data[DataIdx::TOUCHED][(pasteIdx-1)%42] == 0) {
       println("First Touch");
       if (data[DataIdx::X_idx][pasteIdx] > EXAMPLE_LCD_V_RES / 2) {
-        bleMouse.press(MOUSE_RIGHT);
+        bleMouse.click(MOUSE_RIGHT);
       } else {
-        bleMouse.press(MOUSE_LEFT);
+        bleMouse.click(MOUSE_LEFT);
       }      
     }
     else
@@ -337,13 +355,13 @@ void Display::handleClicker(){
   }
   else
   {
-    print("release ");
-    if (data[DataIdx::X_idx][(pasteIdx-1)%42] > EXAMPLE_LCD_V_RES / 2) {
-      bleMouse.release(MOUSE_RIGHT);
-      println("Right");
-    } else {
-      bleMouse.release(MOUSE_LEFT);
-      println("Left");
-    }
+    // print("release ");
+    // if (data[DataIdx::X_idx][(pasteIdx-1)%42] > EXAMPLE_LCD_V_RES / 2) {
+    //   bleMouse.release(MOUSE_RIGHT);
+    //   println("Right");
+    // } else {
+    //   bleMouse.release(MOUSE_LEFT);
+    //   println("Left");
+    // }
   }
 }

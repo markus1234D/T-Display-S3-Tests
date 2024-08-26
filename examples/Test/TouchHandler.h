@@ -8,6 +8,15 @@ class TouchHandler
 {
     public:
     TouchHandler(){
+
+    }
+
+    
+    TouchDrvCSTXXX touch;
+    int16_t x, y;
+
+    bool begin()
+    {
         pinMode(PIN_POWER_ON, OUTPUT);
         digitalWrite(PIN_POWER_ON, HIGH);
 
@@ -53,12 +62,9 @@ class TouchHandler
 
         // Set mirror xy
         // touch.setMirrorXY(true, false);
+
+        return true;
     }
-
-    
-    TouchDrvCSTXXX touch;
-    int16_t x, y;
-
 
     bool readTouch(uint16_t *x, uint16_t *y)
     {

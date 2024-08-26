@@ -3,6 +3,10 @@
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <WebServer.h>
+#include "TouchHandler.h"
+
+TouchHandler touchHandler();
+uint16_t xTouch, yTouch;
 
 // const char *ssid = "SM-Fritz";
 // const char *password = "47434951325606561069";
@@ -11,7 +15,7 @@ const char* password = "e24500606";
 
 WebServer server(80);
 
-Display display(false);
+Display display(true);
 
 void handleRoot() {
     server.send(200, "text/html", R"rawliteral(
@@ -211,35 +215,38 @@ void setup(){
                 int funcIdx = arg.toInt();
                 Serial.print("Function index: ");
                 Serial.println(funcIdx);
-                // switch (funcIdx)
-                // {
-                // case Display::Mode::MOUSE:
-                //     Serial.println("Mode: MOUSE");
-                //     display.funcArray[i] = &Display::handleMouse;
-                //     break;
-                // case Display::Mode::SCROLLJOYSTICK:
-                //     Serial.println("Mode: SCROLLJOYSTICK");
-                //     display.funcArray[i] = &Display::handleScrollJoystick;
-                //     break;
-                // case Display::Mode::MOUSEJOYSTICK:
-                //     Serial.println("Mode: MOUSEJOYSTICK");
-                //     display.funcArray[i] = &Display::handleMouseJoystick;
-                //     break;
-                // case Display::Mode::CLICKER:
-                //     Serial.println("Mode: CLICKER");
-                //     display.funcArray[i] = &Display::handleClicker;
-                //     break;
-                // default:
-                //     display.funcArray[i] = NULL;
-                //     break;
-                // }
+                switch (funcIdx)
+                {
+                case Display::Mode::MOUSE:
+                    Serial.println("Mode: MOUSE");
+                    display.funcArray[i] = &Display::handleMouse;
+                    break;
+                case Display::Mode::SCROLLJOYSTICK:
+                    Serial.println("Mode: SCROLLJOYSTICK");
+                    display.funcArray[i] = &Display::handleScrollJoystick;
+                    break;
+                case Display::Mode::MOUSEJOYSTICK:
+                    Serial.println("Mode: MOUSEJOYSTICK");
+                    display.funcArray[i] = &Display::handleMouseJoystick;
+                    break;
+                case Display::Mode::CLICKER:
+                    Serial.println("Mode: CLICKER");
+                    display.funcArray[i] = &Display::handleClicker;
+                    break;
+                default:
+                    display.funcArray[i] = NULL;
+                    break;
+                }
             }
         }
+        server.send(200, "text/html", "ok");
     });
 }
 
 void loop(){
     display.loop();
-    delay(100);
+    // touchHandler.readTouch(&xTouch, &yTouch);
     server.handleClient();
+
+    delay(100);
 }
