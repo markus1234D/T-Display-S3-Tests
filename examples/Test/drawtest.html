@@ -42,7 +42,7 @@
         const coordinatesDiv = document.getElementById('coordinates');
         const resetButton = document.getElementById('resetButton');
 
-        var ws = new WebSocket("ws://192.168.100.137/");
+        var ws = new WebSocket('ws://' + window.location.hostname + ':81');
         ws.onopen = function() {
             console.log("Hello, Server");
         };
@@ -100,7 +100,7 @@
         resetButton.addEventListener('click', () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             coordinatesDiv.textContent = `X: 0, Y: 0`;
-            ws.("/clear");
+            ws.send("/clear");
         });
     </script>
 </body>
