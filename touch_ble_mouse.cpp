@@ -5,9 +5,16 @@
 #include <TFT_eSPI.h> // Graphics and font library for ST7735 driver chip
 #include <SPI.h>
 
-
-
 using namespace MDO;
+
+#ifdef __cplusplus
+extern "C" {
+    #endif
+    uint8_t temprature_sens_read();
+    #ifdef __cplusplus
+}
+#endif
+uint8_t temprature_sens_read();
 
 int xDistance = 0;
 int yDistance = 0;

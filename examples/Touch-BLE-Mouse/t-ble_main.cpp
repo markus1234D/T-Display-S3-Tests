@@ -5,17 +5,28 @@
 #include <WebServer.h>
 #include "TouchHandler.h"
 
+#ifdef __cplusplus
+extern "C" {
+    #endif
+    uint8_t temprature_sens_read();
+    #ifdef __cplusplus
+}
+#endif
+uint8_t temprature_sens_read();
+
 TouchHandler touchHandler();
 uint16_t xTouch, yTouch;
 
 // const char *ssid = "SM-Fritz";
 // const char *password = "47434951325606561069";
-const char* ssid = "ZenFone7 Pro_6535";
-const char* password = "e24500606";
+// const char* ssid = "ZenFone7 Pro_6535";
+// const char* password = "e24500606";
+const char* ssid = "FRITZ!Mox";
+const char* password = "BugolEiz42";
 
 WebServer server(80);
 
-Display display(true);
+Display display(false);
 
 void handleRoot() {
     server.send(200, "text/html", R"rawliteral(
@@ -242,11 +253,17 @@ void setup(){
         server.send(200, "text/html", "ok");
     });
 }
-
+unsigned long lastMillis = 0;
 void loop(){
     display.loop();
     // touchHandler.readTouch(&xTouch, &yTouch);
     server.handleClient();
 
     delay(100);
+    if (millis() - lastMillis > 1000) {
+        lastMillis = millis();
+        // Convert raw temperature in F to Celsius degrees
+        Serial.print((temprature_sens_read() - 32) / 1.8);
+        Serial.println(" C");
+    }
 }
