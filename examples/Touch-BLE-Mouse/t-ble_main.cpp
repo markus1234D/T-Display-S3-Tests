@@ -260,10 +260,9 @@ void loop(){
     server.handleClient();
 
     delay(100);
+    
     if (millis() - lastMillis > 1000) {
         lastMillis = millis();
-        // Convert raw temperature in F to Celsius degrees
-        Serial.print((temprature_sens_read() - 32) / 1.8);
-        Serial.println(" C");
+
     }
 }

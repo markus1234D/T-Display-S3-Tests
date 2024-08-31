@@ -160,6 +160,9 @@ void handleRoot() {
     <div id="coordinates">X: 0, Y: 0</div>
     <div id="controls">
         <button id="resetButton">Zurücksetzen</button>
+        <label for="brightness">Helligkeit:</label>
+        <input type="range" id="brightness" min="0" max="255" value="128">
+
     </div>
 
     <script>
@@ -197,6 +200,7 @@ void handleRoot() {
         const ctx = canvas.getContext('2d');
         const coordinatesDiv = document.getElementById('coordinates');
         const resetButton = document.getElementById('resetButton');
+        const brightnessInput = document.getElementById('brightness');
 
         let webDrawing = false;
 
@@ -288,11 +292,21 @@ void handleRoot() {
             coordinatesDiv.textContent = `X: 0, Y: 0`;
             ws.send("clear");
         });
+
+        brightnessInput.addEventListener("input", function() {
+        setTimeout(() => {
+            const value = brightnessInput.value;
+            console.log("brightness?value=" + value);
+            ws.send("brightness?value=" + value);
+        }, 100
+    );
+    });
+        function updateBrightness(value) {
+            ws.send("brightness?value=" + value);
+        }
     </script>
 </body>
 </html>
-
-
 
 
 
@@ -303,37 +317,43 @@ void handleRoot() {
 
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
     switch (type) {
-        case WStype_DISCONNECTED:
-            Serial.printf("[%u] Disconnected!\n", num);
-            break;
-        case WStype_CONNECTED:
-            Serial.printf("[%u] Connected!\n", num);
-            webSocketServer.sendTXT(num, "Hello from ESP32!");
-            break;
-        case WStype_TEXT:
-            Serial.printf("[%u] Received text: %s\n", num, payload);
-            String receivedMessage = String((char*)payload);
-            // String response = "ESP32 received: " + receivedMessage;
-            // webSocketServer.sendTXT(num, receivedMessage.c_str());
+    case WStype_DISCONNECTED:
+        Serial.printf("[%u] Disconnected!\n", num);
+        break;
+    case WStype_CONNECTED:
+        Serial.printf("[%u] Connected!\n", num);
+        webSocketServer.sendTXT(num, "Hello from ESP32!");
+        break;
+    case WStype_TEXT:
+        Serial.printf("[%u] Received text: %s\n", num, payload);
+        String receivedMessage = String((char*)payload);
+        // String response = "ESP32 received: " + receivedMessage;
+        // webSocketServer.sendTXT(num, receivedMessage.c_str());
 
-            std::vector<String> argNames;
-            std::vector<String> args;
-            String command = extractCommand(receivedMessage);
-            Serial.println("Command: " + command);
-            int numArgs = extractArgs(receivedMessage, argNames, args);
-            for (int i = 0; i < numArgs; i++) {
-                Serial.println("Arg " + argNames[i] + ": " + args[i]);
+        std::vector<String> argNames;
+        std::vector<String> args;
+        String command = extractCommand(receivedMessage);
+        Serial.println("Command: " + command);
+        int numArgs = extractArgs(receivedMessage, argNames, args);
+        for (int i = 0; i < numArgs; i++) {
+            Serial.println("Arg " + argNames[i] + ": " + args[i]);
+        }
+        if(command == "/coord"){
+            if(numArgs == 2){
+                int x = args[0].toInt();
+                int y = 320-args[1].toInt();                // todo evtl.: 320-y
+                tft.fillCircle(y, x, 3, TFT_RED);
             }
-            if(command == "/coord"){
-                if(numArgs == 2){
-                    int x = args[0].toInt();
-                    int y = 320-args[1].toInt();                // todo evtl.: 320-y
-                    tft.fillCircle(y, x, 3, TFT_RED);
-                }
+        }
+        else if(command == "clear"){
+            tft.fillScreen(TFT_BLACK);
+        }
+        else if(command == "brightness"){
+            if(numArgs == 1){
+                int brightness = args[0].toInt();
+                analogWrite(PIN_LCD_BL, brightness);
             }
-            else if(command == "clear"){
-                tft.fillScreen(TFT_BLACK);
-            }
+        }
     }
 }
 

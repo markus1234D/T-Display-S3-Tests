@@ -355,13 +355,15 @@ void Display::handleClicker(){
   }
   else
   {
-    // print("release ");
-    // if (data[DataIdx::X_idx][(pasteIdx-1)%42] > EXAMPLE_LCD_V_RES / 2) {
-    //   bleMouse.release(MOUSE_RIGHT);
-    //   println("Right");
-    // } else {
-    //   bleMouse.release(MOUSE_LEFT);
-    //   println("Left");
-    // }
+    if(data[DataIdx::TOUCHED][(pasteIdx-1)%42] == 1){
+      println("Release");
+      // if (data[DataIdx::X_idx][(pasteIdx-1)%42] > EXAMPLE_LCD_V_RES / 2) {
+      //   bleMouse.release(MOUSE_RIGHT);
+      //   println("Right");
+      // } else {
+      //   bleMouse.release(MOUSE_LEFT);
+      //   println("Left");
+      // }
+    }
   }
 }

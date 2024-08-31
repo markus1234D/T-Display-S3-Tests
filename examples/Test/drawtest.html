@@ -34,6 +34,9 @@
     <div id="coordinates">X: 0, Y: 0</div>
     <div id="controls">
         <button id="resetButton">Zurücksetzen</button>
+        <label for="brightness">Helligkeit:</label>
+        <input type="range" id="brightness" min="0" max="255" value="128">
+
     </div>
 
     <script>
@@ -71,6 +74,7 @@
         const ctx = canvas.getContext('2d');
         const coordinatesDiv = document.getElementById('coordinates');
         const resetButton = document.getElementById('resetButton');
+        const brightnessInput = document.getElementById('brightness');
 
         let webDrawing = false;
 
@@ -162,6 +166,19 @@
             coordinatesDiv.textContent = `X: 0, Y: 0`;
             ws.send("clear");
         });
+
+        brightnessInput.addEventListener("input", function() {
+        setTimeout(() => {
+            const value = brightnessInput.value;
+            console.log("brightness?value=" + value);
+            ws.send("brightness?value=" + value);
+        }, 100
+    );
+    });
+
+        function updateBrightness(value) {
+            ws.send("brightness?value=" + value);
+        }
     </script>
 </body>
 </html>
